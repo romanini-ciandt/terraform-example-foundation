@@ -230,3 +230,8 @@ variable "private_service_connect_ip" {
   type    = string
   default = "10.10.64.5"
 }
+
+variable "create_kubernetes_deployment" {
+  type    = bool
+  default = false
+}

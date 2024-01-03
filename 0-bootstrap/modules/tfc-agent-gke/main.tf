@@ -134,6 +134,8 @@ data "google_client_config" "default" {
 }
 
 resource "kubernetes_secret" "tfc_agent_secrets" {
+  count = var.create_kubernetes_deployment == true ? 1 : 0
+
   metadata {
     name = var.tfc_agent_k8s_secrets
   }
@@ -148,6 +150,8 @@ resource "kubernetes_secret" "tfc_agent_secrets" {
 
 # Deploy the agent
 resource "kubernetes_deployment" "tfc_agent_deployment" {
+  count = var.create_kubernetes_deployment == true ? 1 : 0
+
   metadata {
     name = "${local.tfc_agent_name}-deployment"
     annotations = { "autopilot.gke.io/resource-adjustment" = jsonencode(

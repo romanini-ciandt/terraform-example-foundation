@@ -17,6 +17,7 @@ This includes:
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | autopilot\_gke\_io\_warden\_version | Autopilot GKE IO Warden Version | `string` | `"2.7.41"` | no |
+| create\_kubernetes\_deployment | n/a | `bool` | `false` | no |
 | create\_service\_account | Set to true to create a new service account, false to use an existing one | `bool` | `true` | no |
 | firewall\_enable\_logging | n/a | `bool` | `true` | no |
 | ip\_range\_pods\_cidr | The secondary IP range CIDR to use for pods | `string` | `"192.168.0.0/18"` | no |

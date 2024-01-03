@@ -306,6 +306,7 @@ module "tfc_agent_gke" {
   # providers = {
   #   kubernetes = kubernetes
   # }
+  # create_kubernetes_deployment = true
 }
 
 resource "google_service_account_iam_member" "self_impersonate" {
