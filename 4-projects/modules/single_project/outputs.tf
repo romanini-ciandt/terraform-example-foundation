@@ -33,3 +33,13 @@ output "enabled_apis" {
   description = "VPC Service Control services."
   value       = distinct(concat(var.activate_apis, ["billingbudgets.googleapis.com"]))
 }
+
+output "project_name" {
+  description = "Name of the Project."
+  value       = module.project.project_name
+}
+
+output "kms_keys" {
+  description = "keys created for the project"
+  value       = { for k, v in google_kms_crypto_key.kms_keys : split("/", k)[3] => v }
+}

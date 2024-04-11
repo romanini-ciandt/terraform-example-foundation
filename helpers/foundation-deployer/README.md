@@ -1,16 +1,8 @@
 # Terraform Example Foundation deploy helper
 
-Helper tool to deploy the Terraform example foundation using Cloud Build and Cloud Source repositories.
+Helper tool to deploy the Terraform example foundation.
 
 ## Usage
-
-## Requirements
-
-- [Go](https://go.dev/doc/install) 1.18+
-- [Google Cloud SDK](https://cloud.google.com/sdk/install) version 393.0.0+
-- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) version 2.28.0+
-- [Terraform](https://www.terraform.io/downloads.html) version 1.3.0+
-- See `0-bootstrap` README for additional IAM [requirements](../../0-bootstrap/README.md#prerequisites) on the user deploying the Foundation.
 
 ### Validate required tools
 
@@ -69,9 +61,7 @@ Helper tool to deploy the Terraform example foundation using Cloud Build and Clo
 
 By default the foundation regional resources are deployed in `us-west1` and `us-central1` regions and multi-regional resources are deployed in the `US` multi-region.
 
-In addition to the variables declared in the file `global.tfvars` for configuring location, there are two locals, `default_region1` and `default_region2`, in each one of the environments (`production`, `nonproduction`, and `development`) in the network steps (`3-networks-dual-svpc` and `3-networks-hub-and-spoke`).
-They are located in the [main.tf](../../3-networks-dual-svpc/envs/production/main.tf#L20-L21) files for each environments.
-Change the two locals **before** starting the deployment to deploy in other regions.
+Im addition to the variables declared in the file `global.tfvars` for configuring location, there are two locals, `default_region1` and `default_region2`, in each one of the environments (`production`, `non-production`, and `development`) in the network steps (`3-networks-dual-svpc` and `3-networks-hub-and-spoke`) . They are located in the [main.tf](../../3-networks-dual-svpc/envs/production/main.tf#L20-L21) files for each environments.
 
 **Note:** the region used for the variable `default_region` in the file `global.tfvars` **MUST** be one of the regions used for the `default_region1` and `default_region2` locals.
 
@@ -105,8 +95,7 @@ Change the two locals **before** starting the deployment to deploy in other regi
     go install
     ```
 
-- Validate the tfvars file. If you configured a `validator_project_id` in the `global.tfvars` file the `validate` flag will do additional checks for the Secure Command Center notification name and for the Tag Key name.
-For these extra check you need at least the roles *Security Center Notification Configurations Viewer* (`roles/securitycenter.notificationConfigViewer`) and *Tag Viewer* (`roles/resourcemanager.tagViewer`):
+- Validate the tfvars file. If you configured a `validator_project_id` in the `global.tfvars` file `validate` will do additional checks for the Secure Command Center notification name and for the Tag Key name. For these extra check you need at least the roles *Security Center Notification Configurations Viewer* (`roles/securitycenter.notificationConfigViewer`) and *Tag Viewer* (`roles/resourcemanager.tagViewer`):
 
     ```bash
     $HOME/go/bin/foundation-deployer -tfvars_file <PATH TO 'global.tfvars' FILE> -validate
@@ -156,7 +145,7 @@ For these extra check you need at least the roles *Security Center Notification 
   -list_steps
         List the existing steps.
   -reset_step step
-        Name of a step to be reset. The step will be marked as pending.
+        Name of a step to be reset.
   -validate
         Validate tfvars file inputs
   -quiet
@@ -169,6 +158,10 @@ For these extra check you need at least the roles *Security Center Notification 
         Prints this help text and exits.
 ```
 
-## Troubleshooting
+## Requirements
 
-See [troubleshooting](../../docs/TROUBLESHOOTING.md) if you run into issues during this deploy.
+- [Go](https://go.dev/doc/install) 1.18+
+- [Google Cloud SDK](https://cloud.google.com/sdk/install) version 393.0.0+
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) version 2.28.0+
+- [Terraform](https://www.terraform.io/downloads.html) version 1.3.0+
+- See `0-bootstrap` README for additional IAM [requirements](../../0-bootstrap/README.md#prerequisites) on the user deploying the Foundation.

@@ -157,10 +157,14 @@ variable "restricted_services" {
   description = "List of services to restrict."
 }
 
-variable "enable_all_vpc_internal_traffic" {
-  type        = bool
-  description = "Enable firewall policy rule to allow internal traffic (ingress and egress)."
-  default     = false
+variable "allow_all_egress_ranges" {
+  description = "List of network ranges to which all egress traffic will be allowed"
+  default     = null
+}
+
+variable "allow_all_ingress_ranges" {
+  description = "List of network ranges from which all ingress traffic will be allowed"
+  default     = null
 }
 
 variable "egress_policies" {
@@ -179,4 +183,10 @@ variable "ingress_policies" {
     to   = any
   }))
   default = []
+}
+
+variable "perimeter_projects" {
+  description = "A list of project numbers to be added to the service perimeter"
+  type        = list(number)
+  default     = []
 }

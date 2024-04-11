@@ -23,7 +23,7 @@ locals {
   ]
   environments = {
     "development" : "d",
-    "nonproduction" : "n",
+    "non-production" : "n",
     "production" : "p"
   }
 }
@@ -31,6 +31,10 @@ locals {
 /******************************************
   Projects for log sinks
 *****************************************/
+
+#Control ID: COM-CO-7.3
+#NIST 800-53: AAU-2 AU-3 AU-8 AU-9
+#CRI Profile: DM.ED-7.1 DM.ED-7.2 DM.ED-7.3 DM.ED-7.4 PR.IP-1.4
 
 module "org_audit_logs" {
   source  = "terraform-google-modules/project-factory/google"
@@ -46,14 +50,13 @@ module "org_audit_logs" {
   activate_apis            = ["logging.googleapis.com", "bigquery.googleapis.com", "billingbudgets.googleapis.com"]
 
   labels = {
-    environment       = "common"
+    environment       = "production"
     application_name  = "org-logging"
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
-    env_code          = "c"
-    vpc               = "none"
+    business_code     = "abcd"
+    env_code          = "p"
   }
   budget_alert_pubsub_topic   = var.project_budget.org_audit_logs_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.org_audit_logs_alert_spent_percents
@@ -75,14 +78,13 @@ module "org_billing_logs" {
   activate_apis            = ["logging.googleapis.com", "bigquery.googleapis.com", "billingbudgets.googleapis.com"]
 
   labels = {
-    environment       = "common"
+    environment       = "production"
     application_name  = "org-billing-logs"
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
-    env_code          = "c"
-    vpc               = "none"
+    business_code     = "abcd"
+    env_code          = "p"
   }
   budget_alert_pubsub_topic   = var.project_budget.org_billing_logs_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.org_billing_logs_alert_spent_percents
@@ -108,20 +110,26 @@ module "org_kms" {
   activate_apis            = ["logging.googleapis.com", "cloudkms.googleapis.com", "billingbudgets.googleapis.com"]
 
   labels = {
-    environment       = "common"
+    environment       = "production"
     application_name  = "org-kms"
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
-    env_code          = "c"
-    vpc               = "none"
+    business_code     = "abcd"
+    env_code          = "p"
   }
 
   budget_alert_pubsub_topic   = var.project_budget.org_kms_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.org_kms_alert_spent_percents
   budget_amount               = var.project_budget.org_kms_budget_amount
   budget_alert_spend_basis    = var.project_budget.org_kms_budget_alert_spend_basis
+}
+
+resource "google_project_iam_member" "kms_sa_base" {
+
+  project = module.org_kms.project_id
+  role    = "roles/cloudkms.admin"
+  member  = "serviceAccount:${local.projects_step_terraform_service_account_email}"
 }
 
 /******************************************
@@ -142,14 +150,13 @@ module "org_secrets" {
   activate_apis            = ["logging.googleapis.com", "secretmanager.googleapis.com", "billingbudgets.googleapis.com"]
 
   labels = {
-    environment       = "common"
+    environment       = "production"
     application_name  = "org-secrets"
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
-    env_code          = "c"
-    vpc               = "none"
+    business_code     = "abcd"
+    env_code          = "p"
   }
   budget_alert_pubsub_topic   = var.project_budget.org_secrets_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.org_secrets_alert_spent_percents
@@ -175,14 +182,13 @@ module "interconnect" {
   activate_apis            = ["billingbudgets.googleapis.com", "compute.googleapis.com"]
 
   labels = {
-    environment       = "network"
+    environment       = "production"
     application_name  = "org-interconnect"
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
-    env_code          = "net"
-    vpc               = "none"
+    business_code     = "abcd"
+    env_code          = "p"
   }
   budget_alert_pubsub_topic   = var.project_budget.interconnect_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.interconnect_alert_spent_percents
@@ -208,14 +214,13 @@ module "scc_notifications" {
   activate_apis            = ["logging.googleapis.com", "pubsub.googleapis.com", "securitycenter.googleapis.com", "billingbudgets.googleapis.com", "cloudkms.googleapis.com"]
 
   labels = {
-    environment       = "common"
+    environment       = "production"
     application_name  = "org-scc"
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
-    env_code          = "c"
-    vpc               = "none"
+    business_code     = "abcd"
+    env_code          = "p"
   }
   budget_alert_pubsub_topic   = var.project_budget.scc_notifications_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.scc_notifications_alert_spent_percents
@@ -249,14 +254,13 @@ module "dns_hub" {
   ]
 
   labels = {
-    environment       = "network"
+    environment       = "production"
     application_name  = "org-dns-hub"
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
-    env_code          = "net"
-    vpc               = "none"
+    business_code     = "abcd"
+    env_code          = "p"
   }
   budget_alert_pubsub_topic   = var.project_budget.dns_hub_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.dns_hub_alert_spent_percents
@@ -291,15 +295,13 @@ module "base_network_hub" {
   ]
 
   labels = {
-    environment       = "network"
     environment       = "production"
     application_name  = "org-base-net-hub"
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
-    env_code          = "net"
-    vpc               = "base"
+    business_code     = "abcd"
+    env_code          = "p"
   }
   budget_alert_pubsub_topic   = var.project_budget.base_net_hub_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.base_net_hub_alert_spent_percents
@@ -342,14 +344,13 @@ module "restricted_network_hub" {
   ]
 
   labels = {
-    environment       = "network"
+    environment       = "production"
     application_name  = "org-restricted-net-hub"
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
-    env_code          = "net"
-    vpc               = "restricted"
+    business_code     = "abcd"
+    env_code          = "p"
   }
   budget_alert_pubsub_topic   = var.project_budget.restricted_net_hub_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.restricted_net_hub_alert_spent_percents

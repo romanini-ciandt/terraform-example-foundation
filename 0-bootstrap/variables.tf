@@ -24,6 +24,16 @@ variable "billing_account" {
   type        = string
 }
 
+variable "group_org_admins" {
+  description = "Google Group for GCP Organization Administrators"
+  type        = string
+}
+
+variable "group_billing_admins" {
+  description = "Google Group for GCP Billing Administrators"
+  type        = string
+}
+
 variable "default_region" {
   description = "Default region to create resources where applicable."
   type        = string
@@ -34,6 +44,12 @@ variable "parent_folder" {
   description = "Optional - for an organization with existing projects or for development/validation. It will place all the example foundation resources under the provided folder instead of the root organization. The value is the numeric folder ID. The folder must already exist."
   type        = string
   default     = ""
+}
+
+variable "org_project_creators" {
+  description = "Additional list of members to have project creator role across the organization. Prefix of group: user: or serviceAccount: is required."
+  type        = list(string)
+  default     = []
 }
 
 variable "org_policy_admin_role" {
@@ -78,9 +94,8 @@ variable "bucket_tfstate_kms_force_destroy" {
 variable "groups" {
   description = "Contain the details of the Groups to be created."
   type = object({
-    create_required_groups = optional(bool, false)
-    create_optional_groups = optional(bool, false)
-    billing_project        = optional(string, null)
+    create_groups   = bool
+    billing_project = string
     required_groups = object({
       group_org_admins           = string
       group_billing_admins       = string
@@ -88,44 +103,65 @@ variable "groups" {
       audit_data_users           = string
       monitoring_workspace_users = string
     })
-    optional_groups = optional(object({
-      gcp_security_reviewer    = optional(string, "")
-      gcp_network_viewer       = optional(string, "")
-      gcp_scc_admin            = optional(string, "")
-      gcp_global_secrets_admin = optional(string, "")
-      gcp_kms_admin            = optional(string, "")
-    }), {})
+    optional_groups = object({
+      gcp_platform_viewer      = string
+      gcp_security_reviewer    = string
+      gcp_network_viewer       = string
+      gcp_scc_admin            = string
+      gcp_global_secrets_admin = string
+      gcp_audit_viewer         = string
+    })
   })
+  default = {
+    create_groups   = false
+    billing_project = ""
+    required_groups = {
+      group_org_admins           = ""
+      group_billing_admins       = ""
+      billing_data_users         = ""
+      audit_data_users           = ""
+      monitoring_workspace_users = ""
+    }
+    optional_groups = {
+      gcp_platform_viewer      = ""
+      gcp_security_reviewer    = ""
+      gcp_network_viewer       = ""
+      gcp_scc_admin            = ""
+      gcp_global_secrets_admin = ""
+      gcp_audit_viewer         = ""
+    }
+  }
 
   validation {
-    condition     = var.groups.create_required_groups || var.groups.create_optional_groups ? (var.groups.billing_project != null ? true : false) : true
+    condition     = var.groups.create_groups == true ? (var.groups.billing_project != "" ? true : false) : true
     error_message = "A billing_project must be passed to use the automatic group creation."
   }
 
   validation {
-    condition     = var.groups.required_groups.group_org_admins != ""
-    error_message = "The group group_org_admins is invalid, it must be a valid email"
+    condition     = var.groups.create_groups == true ? (var.groups.required_groups.group_org_admins != "" ? true : false) : true
+    error_message = "The group group_org_admins is invalid, it must be a valid email."
   }
 
   validation {
-    condition     = var.groups.required_groups.group_billing_admins != ""
-    error_message = "The group group_billing_admins is invalid, it must be a valid email"
+    condition     = var.groups.create_groups == true ? (var.groups.required_groups.group_billing_admins != "" ? true : false) : true
+    error_message = "The group group_billing_admins is invalid, it must be a valid email."
   }
 
   validation {
-    condition     = var.groups.required_groups.billing_data_users != ""
-    error_message = "The group billing_data_users is invalid, it must be a valid email"
+    condition     = var.groups.create_groups == true ? (var.groups.required_groups.billing_data_users != "" ? true : false) : true
+    error_message = "The group billing_data_users is invalid, it must be a valid email."
   }
 
   validation {
-    condition     = var.groups.required_groups.audit_data_users != ""
-    error_message = "The group audit_data_users is invalid, it must be a valid email"
+    condition     = var.groups.create_groups == true ? (var.groups.required_groups.audit_data_users != "" ? true : false) : true
+    error_message = "The group audit_data_users is invalid, it must be a valid email."
   }
 
   validation {
-    condition     = var.groups.required_groups.monitoring_workspace_users != ""
-    error_message = "The group monitoring_workspace_users is invalid, it must be a valid email"
+    condition     = var.groups.create_groups == true ? (var.groups.required_groups.monitoring_workspace_users != "" ? true : false) : true
+    error_message = "The group monitoring_workspace_users is invalid, it must be a valid email."
   }
+
 }
 
 variable "initial_group_config" {
@@ -247,43 +283,6 @@ variable "initial_group_config" {
 #   description = "BGP session range for tunnel 1"
 # }
 
-/* ----------------------------------------
-    Specific to gitlab_bootstrap
-   ---------------------------------------- */
-
-# Un-comment gitlab_bootstrap and its outputs if you want to use GitLab Pipelines instead of Cloud Build
-# variable "gl_repos" {
-#   description = <<EOT
-#   Configuration for the GitLab Repositories to be used to deploy the Terraform Example Foundation stages.
-#   owner: The owner of the repositories. An user or a group.
-#   bootstrap: The repository to host the code of the bootstrap stage.
-#   organization: The repository to host the code of the organization stage.
-#   environments: The repository to host the code of the environments stage.
-#   networks: The repository to host the code of the networks stage.
-#   projects: The repository to host the code of the projects stage.
-#   cicd_runner: The repository to host the code of docker image used for CI/CD.
-#   EOT
-#   type = object({
-#     owner        = string,
-#     bootstrap    = string,
-#     organization = string,
-#     environments = string,
-#     networks     = string,
-#     projects     = string,
-#     cicd_runner  = string,
-#   })
-# }
-
-# variable "gitlab_token" {
-#   description = <<EOT
-#   A GitLab personal access token or group access token.
-#   See:
-#       https://docs.gitlab.com/ee/user/group/settings/group_access_tokens.html
-#       https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html
-#   EOT
-#   type        = string
-#   sensitive   = true
-# }
 
 /* ----------------------------------------
     Specific to tfc_bootstrap

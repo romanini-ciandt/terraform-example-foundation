@@ -20,22 +20,22 @@ terraform {
 
     google = {
       source  = "hashicorp/google"
-      version = ">= 4.3.0, < 6"
+      version = ">= 4.3.0, < 5.0"
     }
 
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.0, < 3"
+      version = ">= 2.0, <3.0"
     }
 
     random = {
       source  = "hashicorp/random"
-      version = ">= 3.4.3, < 4"
+      version = ">= 3.4.3, < 4.0"
     }
   }
 
   provider_meta "google" {
-    module_name = "blueprints/terraform/terraform-google-tf-cloud-agents:tfc-agent-gke/v4.0.0"
+    module_name = "blueprints/terraform/terraform-google-tf-cloud-agents:tfc-agent-gke/v0.1.0"
   }
 }
 

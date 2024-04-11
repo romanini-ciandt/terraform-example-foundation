@@ -49,12 +49,10 @@ func TestAppInfra(t *testing.T) {
 
 	for _, envName := range []string{
 		"development",
-		"nonproduction",
+		"non-production",
 		"production",
 	} {
-		envName := envName
 		t.Run(envName, func(t *testing.T) {
-			t.Parallel()
 
 			projects := tft.NewTFBlueprintTest(t,
 				tft.WithTFDir(fmt.Sprintf("../../../4-projects/business_unit_1/%s", envName)),

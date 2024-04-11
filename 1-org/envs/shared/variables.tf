@@ -20,6 +20,16 @@ variable "enable_hub_and_spoke" {
   default     = false
 }
 
+variable "billing_data_users" {
+  description = "Google Workspace or Cloud Identity group that have access to billing data set."
+  type        = string
+}
+
+variable "audit_data_users" {
+  description = "Google Workspace or Cloud Identity group that have access to audit logs."
+  type        = string
+}
+
 variable "domains_to_allow" {
   description = "The list of domains to allow users from in IAM. Used by Domain Restricted Sharing Organization Policy. Must include the domain of the organization you are deploying the foundation. To add other domains you must also grant access to these domains to the Terraform Service Account used in the deploy."
   type        = list(string)
@@ -87,7 +97,6 @@ variable "log_export_storage_retention_policy" {
   default = null
 }
 
-
 variable "project_budget" {
   description = <<EOT
   Budget configuration for projects.
@@ -105,22 +114,18 @@ variable "project_budget" {
     base_net_hub_alert_spent_percents           = optional(list(number), [1.2])
     base_net_hub_alert_pubsub_topic             = optional(string, null)
     base_net_hub_budget_alert_spend_basis       = optional(string, "FORECASTED_SPEND")
-    base_network_budget_amount                  = optional(number, 1000)
-    base_network_alert_spent_percents           = optional(list(number), [1.2])
-    base_network_alert_pubsub_topic             = optional(string, null)
-    base_network_budget_alert_spend_basis       = optional(string, "FORECASTED_SPEND")
     restricted_net_hub_budget_amount            = optional(number, 1000)
     restricted_net_hub_alert_spent_percents     = optional(list(number), [1.2])
     restricted_net_hub_alert_pubsub_topic       = optional(string, null)
     restricted_net_hub_budget_alert_spend_basis = optional(string, "FORECASTED_SPEND")
-    restricted_network_budget_amount            = optional(number, 1000)
-    restricted_network_alert_spent_percents     = optional(list(number), [1.2])
-    restricted_network_alert_pubsub_topic       = optional(string, null)
-    restricted_network_budget_alert_spend_basis = optional(string, "FORECASTED_SPEND")
     interconnect_budget_amount                  = optional(number, 1000)
     interconnect_alert_spent_percents           = optional(list(number), [1.2])
     interconnect_alert_pubsub_topic             = optional(string, null)
     interconnect_budget_alert_spend_basis       = optional(string, "FORECASTED_SPEND")
+    org_kms_budget_amount                       = optional(number, 1000)
+    org_kms_alert_spent_percents                = optional(list(number), [1.2])
+    org_kms_alert_pubsub_topic                  = optional(string, null)
+    org_kms_budget_alert_spend_basis            = optional(string, "FORECASTED_SPEND")
     org_secrets_budget_amount                   = optional(number, 1000)
     org_secrets_alert_spent_percents            = optional(list(number), [1.2])
     org_secrets_alert_pubsub_topic              = optional(string, null)
@@ -133,14 +138,26 @@ variable "project_budget" {
     org_audit_logs_alert_spent_percents         = optional(list(number), [1.2])
     org_audit_logs_alert_pubsub_topic           = optional(string, null)
     org_audit_logs_budget_alert_spend_basis     = optional(string, "FORECASTED_SPEND")
-    org_kms_budget_amount                       = optional(number, 1000)
-    org_kms_alert_spent_percents                = optional(list(number), [1.2])
-    org_kms_alert_pubsub_topic                  = optional(string, null)
-    org_kms_budget_alert_spend_basis            = optional(string, "FORECASTED_SPEND")
     scc_notifications_budget_amount             = optional(number, 1000)
     scc_notifications_alert_spent_percents      = optional(list(number), [1.2])
     scc_notifications_alert_pubsub_topic        = optional(string, null)
     scc_notifications_budget_alert_spend_basis  = optional(string, "FORECASTED_SPEND")
+    base_network_budget_amount                  = optional(number, 1000)
+    base_network_alert_spent_percents           = optional(list(number), [1.2])
+    base_network_alert_pubsub_topic             = optional(string, null)
+    base_network_budget_alert_spend_basis       = optional(string, "FORECASTED_SPEND")
+    restricted_network_budget_amount            = optional(number, 1000)
+    restricted_network_alert_spent_percents     = optional(list(number), [1.2])
+    restricted_network_alert_pubsub_topic       = optional(string, null)
+    restricted_network_budget_alert_spend_basis = optional(string, "FORECASTED_SPEND")
+    artifacts_budget_amount                     = optional(number, 1000)
+    artifacts_alert_spent_percents              = optional(list(number), [1.2])
+    artifacts_alert_pubsub_topic                = optional(string, null)
+    artifacts_budget_alert_spend_basis          = optional(string, "FORECASTED_SPEND")
+    service_catalog_budget_amount               = optional(number, 1000)
+    service_catalog_alert_spent_percents        = optional(list(number), [1.2])
+    service_catalog_alert_pubsub_topic          = optional(string, null)
+    service_catalog_budget_alert_spend_basis    = optional(string, "FORECASTED_SPEND")
   })
   default = {}
 }
@@ -156,12 +173,27 @@ variable "gcp_groups" {
   global_secrets_admin: Google Workspace or Cloud Identity group that members are responsible for putting secrets into Secrets Manage
   EOT
   type = object({
-    audit_viewer         = optional(string, null)
+    platform_viewer      = optional(string, null)
     security_reviewer    = optional(string, null)
     network_viewer       = optional(string, null)
     scc_admin            = optional(string, null)
+    audit_viewer         = optional(string, null)
     global_secrets_admin = optional(string, null)
-    kms_admin            = optional(string, null)
+  })
+  default = {}
+}
+
+variable "gcp_user" {
+  description = <<EOT
+  Users to grant specific roles in the Organization.
+  org_admin: Identity that has organization administrator permissions.
+  billing_creator: Identity that can create billing accounts.
+  billing_admin: Identity that has billing administrator permissions.
+  EOT
+  type = object({
+    org_admin       = optional(string, null)
+    billing_creator = optional(string, null)
+    billing_admin   = optional(string, null)
   })
   default = {}
 }
@@ -187,6 +219,7 @@ variable "create_unique_tag_key" {
   type        = bool
   default     = false
 }
+
 variable "cai_monitoring_kms_force_destroy" {
   description = "If set to true, delete KMS keyring and keys when destroying the module; otherwise, destroying the module will fail if KMS keys are present."
   type        = bool
@@ -197,4 +230,19 @@ variable "tfc_org_name" {
   description = "Name of the TFC organization"
   type        = string
   default     = ""
+}
+
+variable "keyring_name" {
+  description = "Name to be used for KMS Keyring"
+  type        = string
+  default     = "sample-keyring"
+}
+
+variable "keyring_regions" {
+  description = "Regions to create keyrings in"
+  type        = list(string)
+  default = [
+    "us-central1",
+    "us-east4"
+  ]
 }

@@ -58,7 +58,7 @@ variable "secondary_contact" {
 variable "business_code" {
   description = "The code that describes which business unit owns the project"
   type        = string
-  default     = "shared"
+  default     = "abcd"
 }
 
 variable "activate_apis" {
@@ -72,15 +72,10 @@ variable "environment" {
   type        = string
 }
 
-variable "vpc" {
-  description = "The type of VPC to attach the project to. Possible options are none, base, or restricted."
+variable "vpc_type" {
+  description = "The type of VPC to attach the project to. Possible options are base or restricted."
   type        = string
-  default     = "none"
-
-  validation {
-    condition     = contains(["none", "base", "restricted"], var.vpc)
-    error_message = "For vpc, only `none`, `base`, or `restricted` are valid."
-  }
+  default     = ""
 }
 
 variable "shared_vpc_host_project_id" {
@@ -152,4 +147,26 @@ variable "enable_cloudbuild_deploy" {
   description = "Enable infra deployment using Cloud Build"
   type        = bool
   default     = false
+}
+
+variable "key_rotation_period" {
+  description = "Rotation period in seconds to be used for KMS Key"
+  type        = string
+  default     = "7776000s"
+}
+
+variable "key_rings" {
+  description = "Keyrings to attach project key to"
+  type        = list(string)
+}
+
+variable "remote_state_bucket" {
+  description = "Backend bucket to load Terraform Remote State Data from previous steps."
+  type        = string
+}
+
+variable "default_service_account" {
+  description = "Project default service account setting: can be one of `delete`, `depriviledge`, or `keep`."
+  default     = "disable"
+  type        = string
 }

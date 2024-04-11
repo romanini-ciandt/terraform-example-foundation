@@ -222,14 +222,14 @@ function validate_bootstrap_step(){
         echo "  Rename the file 0-bootstrap/terraform.example.tfvars to 0-bootstrap/terraform.tfvars"
         ERRORS+=$'  terraform.tfvars file must exist for 0-bootstrap step.\n'
     else
-	if [ "$(grep -v '^#' "$FILE" |grep -c 'REPLACE_ME')" != 0 ]; then
+        if [ "$(grep -c REPLACE_ME "$FILE")" != 0 ]; then
             echo "  0-bootstrap/terraform.tfvars must have required values fulfilled."
             ERRORS+=$'  terraform.tfvars file must be correctly fulfilled for 0-bootstrap step.\n'
         fi
     fi
 }
 
-# Checks if initial config was done for 0-bootstrap step using external repository
+# Checks if initial config was done for 0-bootstrap step in Terraform Cloud deploy
 function validate_bootstrap_step_external_repo(){
     SCRIPTS_DIR="$( dirname -- "$0"; )"
     FILE="$SCRIPTS_DIR/../../gcp-bootstrap/envs/shared/terraform.tfvars"
@@ -237,7 +237,7 @@ function validate_bootstrap_step_external_repo(){
         echo "  Rename the file gcp-bootstrap/envs/shared/terraform.example.tfvars to gcp-bootstrap/envs/shared/terraform.tfvars"
         ERRORS+=$'  terraform.tfvars file must exist for gcp-bootstrap step.\n'
     else
-	if [ "$(grep -v '^#' "$FILE" |grep -c 'REPLACE_ME')" != 0 ]; then
+        if [ "$(grep -c REPLACE_ME "$FILE")" != 0 ]; then
             echo "  gcp-bootstrap/envs/shared/terraform.tfvars must have required values fulfilled."
             ERRORS+=$'  terraform.tfvars file must be correctly fulfilled for gcp-bootstrap step.\n'
         fi
@@ -324,10 +324,10 @@ function main(){
 usage() {
     echo
     echo " Usage:"
-    echo "     $0 -o <organization id> -b <billing account id> -u <end user email> [-e]"
-    echo "         organization id                   (required)"
-    echo "         billing account id                (required)"
-    echo "         end user email                    (required)"
+    echo "     $0 -o <organization id> -b <billing account id> -u <end user email>"
+    echo "         organization id          (required)"
+    echo "         billing account id       (required)"
+    echo "         end user email           (required)"
     echo "         set -e if using an external repo  (optional)"
     echo
     exit 1
@@ -365,7 +365,7 @@ shift $((OPTIND -1))
 # Check for required input variables
 if [ -z "${ORGANIZATION_ID}" ] || [ -z "${BILLING_ACCOUNT}" ]|| [ -z "${END_USER_CREDENTIAL}" ]; then
   echo
-  echo " Error: -o <organization id>, -b <billing account id> and -u <end user email> are required."
+  echo " Error: -o <organization id>, -b <billing account id> and -u <end user email> required."
   usage
 fi
 

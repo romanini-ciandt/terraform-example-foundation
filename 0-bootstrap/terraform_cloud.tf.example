@@ -53,22 +53,22 @@ locals {
     },
     "env" = {
       "2-production"     = { vcs_branch = "production", directory = "/envs/production" },
-      "2-nonproduction" = { vcs_branch = "nonproduction", directory = "/envs/nonproduction" },
+      "2-non-production" = { vcs_branch = "non-production", directory = "/envs/non-production" },
       "2-development"    = { vcs_branch = "development", directory = "/envs/development" },
     },
     "net" = {
       "3-production"     = { vcs_branch = "production", directory = "/envs/production" },
-      "3-nonproduction" = { vcs_branch = "nonproduction", directory = "/envs/nonproduction" },
+      "3-non-production" = { vcs_branch = "non-production", directory = "/envs/non-production" },
       "3-development"    = { vcs_branch = "development", directory = "/envs/development" },
       "3-shared"         = { vcs_branch = "production", directory = "/envs/shared" },
     },
     "proj" = {
       "4-bu1-production"     = { vcs_branch = "production", directory = "/business_unit_1/production" },
-      "4-bu1-nonproduction" = { vcs_branch = "nonproduction", directory = "/business_unit_1/nonproduction" },
+      "4-bu1-non-production" = { vcs_branch = "non-production", directory = "/business_unit_1/non-production" },
       "4-bu1-development"    = { vcs_branch = "development", directory = "/business_unit_1/development" },
       "4-bu1-shared"         = { vcs_branch = "production", directory = "/business_unit_1/shared" },
       "4-bu2-production"     = { vcs_branch = "production", directory = "/business_unit_2/production" },
-      "4-bu2-nonproduction" = { vcs_branch = "nonproduction", directory = "/business_unit_2/nonproduction" },
+      "4-bu2-non-production" = { vcs_branch = "non-production", directory = "/business_unit_2/non-production" },
       "4-bu2-development"    = { vcs_branch = "development", directory = "/business_unit_2/development" },
       "4-bu2-shared"         = { vcs_branch = "production", directory = "/business_unit_2/shared" },
 
@@ -286,7 +286,7 @@ resource "tfe_agent_pool" "tfc_agent_pool" {
 resource "tfe_agent_token" "tfc_agent_token" {
   count = var.enable_tfc_cloud_agents == true ? 1 : 0
 
-  agent_pool_id = tfe_agent_pool.tfc_agent_pool[0].id
+  agent_pool_id = tfe_agent_pool.tfc_agent_pool.id
   description   = var.tfc_agent_pool_token_description
 }
 
@@ -306,12 +306,4 @@ module "tfc_agent_gke" {
   # providers = {
   #   kubernetes = kubernetes
   # }
-}
-
-resource "google_service_account_iam_member" "self_impersonate" {
-  for_each = local.granular_sa
-
-  service_account_id = google_service_account.terraform-env-sa[each.key].id
-  role               = "roles/iam.serviceAccountTokenCreator"
-  member             = "serviceAccount:${google_service_account.terraform-env-sa[each.key].email}"
 }

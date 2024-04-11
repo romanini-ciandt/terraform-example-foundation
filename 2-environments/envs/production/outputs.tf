@@ -34,6 +34,11 @@ output "env_kms_project_id" {
   value       = module.env.env_kms_project_id
 }
 
+output "env_kms_project_number" {
+  description = "Project Number for environment Cloud Key Management Service (KMS)."
+  value       = module.env.env_kms_project_number
+}
+
 output "assured_workload_id" {
   description = "Assured Workload ID."
   value       = module.env.assured_workload_id
@@ -42,4 +47,24 @@ output "assured_workload_id" {
 output "assured_workload_resources" {
   description = "Resources associated with the Assured Workload."
   value       = module.env.assured_workload_resources
+}
+
+output "key_rings" {
+  description = "Keyring Names created"
+  value       = module.env.key_rings
+}
+
+output "env_log_project_id" {
+  description = "Project ID of the environments log project"
+  value       = module.env.env_logs_project_id
+}
+
+output "env_log_project_number" {
+  description = "Project Number of the environments log project"
+  value       = module.env.env_logs_project_number
+}
+
+output "env_log_bucket_name" {
+  description = "Name of environment log bucket"
+  value       = module.env.env_log_bucket_name
 }

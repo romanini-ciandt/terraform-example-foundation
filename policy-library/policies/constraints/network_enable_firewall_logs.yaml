@@ -1,0 +1,30 @@
+# Copyright 2023 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#Control ID: COM-CO-7.5
+#NIST 800-53: AAU-2 AU-3 AU-8 AU-9
+#CRI Profile: DM.ED-7.1 DM.ED-7.2 DM.ED-7.3 DM.ED-7.4 PR.IP-1.4
+apiVersion: constraints.gatekeeper.sh/v1alpha1
+kind: GCPNetworkEnableFirewallLogsConstraintV1
+metadata:
+  name: enable-network-firewall-logs
+  annotations:
+    description: Ensure Firewall logs is enabled for every firewall in VPC Network
+    bundles.validator.forsetisecurity.org/healthcare-baseline-v1: security
+spec:
+  severity: high
+  match:
+    ancestries:
+    - "organizations/**"
+  parameters: {}

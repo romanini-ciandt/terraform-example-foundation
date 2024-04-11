@@ -42,9 +42,8 @@ module "monitoring_project" {
     billing_code      = "1234"
     primary_contact   = "example1"
     secondary_contact = "example2"
-    business_code     = "shared"
+    business_code     = "abcd"
     env_code          = var.environment_code
-    vpc               = "none"
   }
   budget_alert_pubsub_topic   = var.project_budget.monitoring_alert_pubsub_topic
   budget_alert_spent_percents = var.project_budget.monitoring_alert_spent_percents
